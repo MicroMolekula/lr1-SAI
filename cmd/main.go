@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	fileName = "base_knowledge_5.txt"
+	fileName = "base_knowledge.txt"
 )
 
 func handlerObjectsValue(w http.ResponseWriter, r *http.Request) {
