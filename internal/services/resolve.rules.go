@@ -2,13 +2,11 @@ package services
 
 import (
 	"AiLab1/internal/models"
-	"log"
 )
 
 func GetTrueRules(object models.Object, rules []models.Rule) []models.Object {
 	objects := make([]models.Object, 0, len(rules))
 	indexStart := findIndexInRules(object, rules)
-	log.Println("Test", indexStart)
 	if indexStart > 0 {
 		objects = downToUp(object, rules, indexStart)
 	} else {
