@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ЛР1 СИИ</title>
+</head>
+<body>
+    <div style="width: 80%; margin-inline: auto">
+        <select id="name">
+        </select>
+        <select id="value">
+        </select>
+        <button id="btn">Запустить</button>
+        <div id="result">
+
+        </div>
+    </div>
+</body>
+<script type="module">
+    let response = await fetch('http://localhost:8080/api/objects/values/')
+    let responseJson = await response.json()
+
+    function fillSelect(id, data) {
+        let select = document.getElementById(id)
+        select.className = 'custom-select'
+        let option = document.createElement("option")
+        option.selected = true
+        option.value = ""
+        option.innerText = "Выбрать..."
+        select.append(option)
+        for (let i = 0; i < data.length; i++) {
+            let option = document.createElement("option")
+            option.value = data[i]
+            option.innerText = data[i]
+            select.append(option)
+        }
+    }
+
+    fillSelect("name", getNamesFromResponse(responseJson))
+    fillSelect("value", [])
+
+    let selectName = document.getElementById("name")
+    selectName.addEventListener("change", function () {
+        const selectValue = document.getElementById("value");
+        while(selectValue.firstChild){
+            selectValue.removeChild(selectValue.firstChild);
+        }
+        if (selectName.value !== "") {
+            fillSelect("value", getValuesForName(selectName.value, responseJson))
+        } else {
+            fillSelect("value", [])
+        }
+    })
+
+    function getValuesForName(name, data) {
+        for (let i = 0; i < data.length; i++) {
+            if (data[i]["name"] === name) {
+                return data[i]["values"]
+            }
+        }
+        return []
+    }
+
+    function getNamesFromResponse(data) {
+        let result = []
+        for (let i = 0; i < data.length; i++) {
+            result.push(data[i]['name'])
+        }
+        return result
+    }
+
+    function fillResult(data) {
+        let resultDiv = document.getElementById("result")
+        while(resultDiv.firstChild){
+            resultDiv.removeChild(resultDiv.firstChild);
+        }
+        for (let i = 0; i < data.length; i++) {
+            let block = document.createElement("div")
+            block.innerText = `${data[i]["name"]} = ${data[i]["value"]}`
+            resultDiv.append(block)
+        }
+    }
+
+    let button = document.getElementById('btn')
+    button.addEventListener("click", async function() {
+        let request = {
+            name: document.getElementById("name").value,
+            value: document.getElementById("value").value
+        }
+
+        let response = await fetch('http://localhost:8080/api/objects/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(request)
+        })
+
+        let result = await response.json()
+        console.log(result)
+        fillResult(result)
+    })
+</script>
+</html>
